@@ -67,9 +67,9 @@ public class basicDriveTrain extends LinearOpMode{
                 useFavouredDriving = false;
             }
 
-            while (useFavouredDriving){
+            if (useFavouredDriving){
                 favouredDriving();
-            while (useFavouredDriving == false) {
+            } else {
                 unfavouredDriving();
             }
 
@@ -141,4 +141,5 @@ public class basicDriveTrain extends LinearOpMode{
 
 
 }
+
 
