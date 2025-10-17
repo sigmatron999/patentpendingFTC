@@ -22,10 +22,10 @@ public class basicDriveTrain extends LinearOpMode{
     public void runOpMode(){
 
         // Initializing motors
-        FrontLeftMotor = hardwareMap.get(DcMotor.class, "FrontLeftMotor");
-        FrontRightMotor = hardwareMap.get(DcMotor.class, "FrontRightMotor");
-        BackLeftMotor = hardwareMap.get(DcMotor.class, "BackRightMotor");
-        BackRightMotor = hardwareMap.get(DcMotor.class, "BackLeftMotor");
+        FrontLeftMotor = hardwareMap.get(DcMotor.class, "FrontLeft");
+        FrontRightMotor = hardwareMap.get(DcMotor.class, "FrontRight");
+        BackLeftMotor = hardwareMap.get(DcMotor.class, "BackRight");
+        BackRightMotor = hardwareMap.get(DcMotor.class, "BackLeft");
 
         FrontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         FrontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -123,11 +123,12 @@ public class basicDriveTrain extends LinearOpMode{
 
     private void setMotorPower(double leftPower, double rightPower) {
 
-        FrontLeftMotor.setPower(leftPower);
-        BackLeftMotor.setPower(leftPower);
-        FrontRightMotor.setPower(rightPower);
-        BackRightMotor.setPower(rightPower);
+        frontLeftMotor.setPower(leftPower);
+        backLeftMotor.setPower(leftPower);
+        frontRightMotor.setPower(rightPower);
+        backRightMotor.setPower(rightPower);
     }
+
 
 
 
