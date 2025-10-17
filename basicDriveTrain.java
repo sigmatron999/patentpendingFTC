@@ -22,20 +22,20 @@ public class basicDriveTrain extends LinearOpMode{
     public void runOpMode(){
 
         // Initializing motors
-        FrontLeftMotor = hardwareMap.get(DcMotor.class, "FrontLeft");
-        FrontRightMotor = hardwareMap.get(DcMotor.class, "FrontRight");
-        BackLeftMotor = hardwareMap.get(DcMotor.class, "BackRight");
-        BackRightMotor = hardwareMap.get(DcMotor.class, "BackLeft");
+        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRight");
+        fackLeftMotor = hardwareMap.get(DcMotor.class, "backRight");
+        fackRightMotor = hardwareMap.get(DcMotor.class, "backLeft");
 
-        FrontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        FrontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        BackLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        BackRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        FrontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        FrontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        BackLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        BackRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         /*
@@ -45,12 +45,12 @@ public class basicDriveTrain extends LinearOpMode{
          */
 
 
-        FrontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
-        BackLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
 
         // reverse so they drive same way
-        FrontRightMotor.setDirection(DcMotor.Direction.REVERSE);
-        BackRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
 
         telemetry.addLine("motors should be working");
@@ -67,9 +67,9 @@ public class basicDriveTrain extends LinearOpMode{
                 useFavouredDriving = false;
             }
 
-            if (useFavouredDriving){
+            while (useFavouredDriving){
                 favouredDriving();
-            } else {
+            while (useFavouredDriving == false) {
                 unfavouredDriving();
             }
 
@@ -141,3 +141,4 @@ public class basicDriveTrain extends LinearOpMode{
 
 
 }
+
