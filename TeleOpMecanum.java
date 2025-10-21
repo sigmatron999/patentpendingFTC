@@ -12,10 +12,10 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeftMotor");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRightMotor");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeftMotor");
+        backRight = hardwareMap.get(DcMotor.class, "backRightMotor");
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -41,5 +41,24 @@ public class TeleOpMecanum extends OpMode {
         backLeft.setPower(bl);
         frontRight.setPower(fr);
         backRight.setPower(br);
+
+        telemetry.addLine("CONTROLLER INPUT");
+        telemetry.addData("y", y);
+        telemetry.addData("x", x);
+        telemetry.addData("rx", rx);
+
+        telemetry.addLine("MOTOR VALUES");
+        telemetry.addData("Front Left Power", fl);
+        telemetry.addData("Front Right Power", fr);
+        telemetry.addData("Back Left Power", bl);
+        telemetry.addData("Back Right Power", br);
+
+        telemetry.update();
+
+        // UNCOMMENT THIS IF YOU NEED TO TEST THE MOTOR CONNECTION
+        // frontLeft.setPower(1);
+        // frontRight.setPower(1);
+        // backLeft.setPower(1);
+        // backRight.setPower(1);
     }
 }
