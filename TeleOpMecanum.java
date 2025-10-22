@@ -23,25 +23,37 @@ public class TeleOpMecanum extends OpMode {
 
     @Override
     public void loop() {
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
+        // note: The y-axis is reversed, so we negate it
+        double y = -gamepad1.left_stick_y;   // forward/backward
+        double x = gamepad1.left_stick_x;    // strafe left/right
+        double rx = gamepad1.right_stick_x;  // rotate right/left
 
+        // basic mecanum drive math to calculate power for each motor
         double fl = y + x + rx;
         double bl = y - x + rx;
         double fr = y - x - rx;
         double br = y + x - rx;
 
-        double max = Math.max(Math.max(Math.abs(fl), Math.abs(fr)), Math.max(Math.abs(bl), Math.abs(br)));
+        // find the maximum power value (for normalization)
+        double max = Math.max(
+                Math.max(Math.abs(fl), Math.abs(fr)), Math.max(Math.abs(bl), Math.abs(br))
+        );
+
+        // if any value is above 1, scale all powers proportionally
         if (max > 1) {
-            fl /= max; fr /= max; bl /= max; br /= max;
+            fl /= max;
+            fr /= max;
+            bl /= max;
+            br /= max;
         }
 
+        // apply calculated powers to motors
         frontLeft.setPower(fl);
         backLeft.setPower(bl);
         frontRight.setPower(fr);
         backRight.setPower(br);
 
+        // DEBUGGING
         telemetry.addLine("CONTROLLER INPUT");
         telemetry.addData("y", y);
         telemetry.addData("x", x);
@@ -56,9 +68,11 @@ public class TeleOpMecanum extends OpMode {
         telemetry.update();
 
         // UNCOMMENT THIS IF YOU NEED TO TEST THE MOTOR CONNECTION
-        // frontLeft.setPower(1);
-        // frontRight.setPower(1);
-        // backLeft.setPower(1);
-        // backRight.setPower(1);
+        /*
+        frontLeft.setPower(1);
+        frontRight.setPower(1);
+        backLeft.setPower(1);
+        backRight.setPower(1);
+         */
     }
 }
