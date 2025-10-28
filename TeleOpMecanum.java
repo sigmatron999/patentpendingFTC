@@ -34,6 +34,7 @@ public class TeleOpMecanum extends LinearOpMode {
         }
     }
 
+    // called every tick after start
     void drive() {
         // note: The y-axis is reversed, so we negate it
         double y = -gamepad1.left_stick_y;   // forward/backward
