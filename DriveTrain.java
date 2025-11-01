@@ -1,23 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
-
-
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-
 public class DriveTrain {
     private double speedScalar = 1.0;
 
-    // initial motors
-    private DcMotor frontLeftMotor = null;
-    private DcMotor frontRightMotor = null;
-    private DcMotor backLeftMotor = null;
-    private DcMotor backRightMotor = null;
-    
-    public boolean isMoving = true;
+    // initialize motors
+    private DcMotor frontLeftMotor;
+    private DcMotor frontRightMotor;
+    private DcMotor backLeftMotor;
+    private DcMotor backRightMotor;
+
+    public boolean isMoving = false;
 
 
     public void init(HardwareMap hwMap){
@@ -37,12 +33,11 @@ public class DriveTrain {
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
         /* -----------------------------------------
         IF THE ROBOT IS DRIVING IN REVERSE, FLIP THESE
         ---------------------------------------------
         */
-        
+
         frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
         backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
 
@@ -53,17 +48,13 @@ public class DriveTrain {
     }
 
     // restrict the angle reading, in radians, from the imu [-π, π]
-    
     private double angleWrap(double rad){
-
         while (rad > Math.PI){
-
             rad -= Math.PI * 2;
         }
         while (rad < -Math.PI) {
             rad += Math.PI *2;
         }
-
         return rad;
     }
 
@@ -72,19 +63,19 @@ public class DriveTrain {
     field oriented drive; movement control is relative to the field, disregarding robot direction
     ex. If the robot is facing backward relative to the field, but the joystick points forward, the robot drives forward
     */
-    
+
     public void fieldOrientedTranslate(double targetPowerX, double targetPowerY, double rotation, double currentRotation) {
 
 
-        // direction robot is facing, in angles
+        // direction robot is facing, in degrees
         double robotYawDeg = Math.toDegrees(angleWrap(Math.toRadians(currentRotation)));
 
         // direction stick is pointing, mapped to [-180, 180]
-        double stickRotationDeg = Math.atan2(targetPowerY, targetPowerX) * 180/Math.PI;
+        double stickRotationDeg = Math.toDegrees(Math.atan2(targetPowerY, targetPowerX));
 
         // offset joystick vector to account for robot orientation
         double thetaDeg = 360.0 - robotYawDeg + stickRotationDeg;
-        
+
         // sets power to be length of joystick vector
         double power = Math.hypot(targetPowerX, targetPowerY);
 
@@ -93,21 +84,28 @@ public class DriveTrain {
         power = Range.clip(power, -1.0, 1.0);
 
 
-        // sin, cos of corrected angle
+        // sin, cos of corrected angle, accounting for mecanum offset
         double sin = Math.sin((thetaDeg*Math.PI/180.0) + Math.PI/4);
         double cos = Math.cos((thetaDeg*Math.PI/180.0) + Math.PI/4);
 
-        // max of sin, cos; prevents sin, cos from exceding 1
+
         double maxSinCos = Math.max(Math.abs(sin), Math.abs(cos));
 
-        
+
         double frontRightPower;
         double frontLeftPower;
         double backRightPower;
         double backLeftPower;
 
-        
+
         rotation *= -1;
+
+        /*
+        Essentially, sin and cos are representative of the vertical and
+        horizontal vectors that comprise the vector of
+        the angle theta. By applying sin to the power of one set of wheels,
+        and cos to other, we recreate that vector.
+         */
 
         frontLeftPower = power*cos/maxSinCos + rotation;
         backLeftPower = power*sin/maxSinCos + rotation;
@@ -118,32 +116,28 @@ public class DriveTrain {
         double frontMax = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
         double backMax = Math.max(Math.abs(backLeftPower), Math.abs(backRightPower));
 
+        double maxPower = Math.max(frontMax, backMax);
 
         // a normalization
-        if ((power + Math.abs(rotation) > 1)){
+        if (maxPower > 1.0) {
 
+            frontLeftPower /= maxPower;
+            frontRightPower /= maxPower;
 
-            frontLeftPower /= power + Math.abs(rotation);
-            backLeftPower /= power + Math.abs(rotation);
-
-            frontRightPower /= power - Math.abs(rotation);
-            backRightPower /= power - Math.abs(rotation);
-        }
-
-        if (isMoving){
-
-            if (motorsNotNull()) {
-
-                // speedScalar will be set from the main function (whenever its built)
-                frontLeftMotor.setPower(frontLeftPower * speedScalar);
-                frontRightMotor.setPower(frontRightPower * speedScalar);
-
-                backLeftMotor.setPower(backLeftPower * speedScalar);
-                backRightMotor.setPower(backRightPower * speedScalar);
-            }
+            backLeftPower /= maxPower;
+            backRightPower /= maxPower;
 
         }
-        
+        // isMoving will serve for autonomous
+        if (isMoving && this.motorsNotNull()){
+
+            // speedScalar will be set from the main function (whenever its built)
+            frontLeftMotor.setPower(frontLeftPower * speedScalar);
+            frontRightMotor.setPower(frontRightPower * speedScalar);
+
+            backLeftMotor.setPower(backLeftPower * speedScalar);
+            backRightMotor.setPower(backRightPower * speedScalar);
+        }
     }
     // android studio was complaining about the complex if statement
     private boolean motorsNotNull() {
@@ -151,7 +145,7 @@ public class DriveTrain {
     }
 
     // drive relative to the robot
-    // ex. forward on joystick = forward on robot, even if the robot is sideways
+    // similar to the above code, though without angle adjustments
     public void robotOrientedTranslate(double targetPowerX, double targetPowerY, double rotation){
 
         double thetaRad = Math.atan2(targetPowerY, targetPowerX);
@@ -167,7 +161,6 @@ public class DriveTrain {
         double backRightPower;
         double backLeftPower;
 
-
         rotation *= -1;
 
         frontLeftPower = power*cos/maxSinCos + rotation;
@@ -176,44 +169,31 @@ public class DriveTrain {
         frontRightPower = power*cos/maxSinCos - rotation;
         backRightPower = power*sin/maxSinCos - rotation;
 
-        
-        if ((1.0 < power + Math.abs(rotation))){
+        double frontMax = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
+        double backMax = Math.max(Math.abs(backLeftPower), Math.abs(backRightPower));
 
+        double maxPower = Math.max(frontMax, backMax);
 
-            frontLeftPower /= power + Math.abs(rotation);
-            backLeftPower /= power + Math.abs(rotation);
+        if (maxPower > 1.0){
+            frontLeftPower /= maxPower;
+            frontRightPower /= maxPower;
 
-            frontRightPower /= power - Math.abs(rotation);
-            backRightPower /= power - Math.abs(rotation);
-        }
-
-        if (isMoving){
-
-            if (motorsNotNull()) {
-
-                frontLeftMotor.setPower(frontLeftPower * speedScalar);
-                frontRightMotor.setPower(frontRightPower * speedScalar);
-
-                backLeftMotor.setPower(backLeftPower * speedScalar);
-                backRightMotor.setPower(backRightPower * speedScalar);
-            }
+            backLeftPower /= maxPower;
+            backRightPower /= maxPower;
 
         }
 
+        if (this.isMoving && this.motorsNotNull()){
+
+            frontLeftMotor.setPower(frontLeftPower * speedScalar);
+            frontRightMotor.setPower(frontRightPower * speedScalar);
+
+            backLeftMotor.setPower(backLeftPower * speedScalar);
+            backRightMotor.setPower(backRightPower * speedScalar);
+        }
     }
-
-    public void setSpeedScalar(double change)
-    {
-        // asssigned from main function (whenever we build it)
-        speedScalar = change;
-
+    public void setSpeedScalar(double change) {
+        // assigned from main function (whenever we build it)
+        speedScalar = Range.clip(change, 0.0, 1.0);
     }
-
-
-
-
-
-
-
-
 }
